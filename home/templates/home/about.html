@@ -1,0 +1,72 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - VibeWear</title>
+    <link rel="stylesheet" href="{% static 'home/style.css' %}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="#"><img src="{% static 'home/good-vibes.png' %}" alt="VibeWear Logo" style="width: 30px; height: 30px;"></a>
+            <span>VibeWear</span>
+        </div>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="about">
+        <h1>About VibeWear</h1>
+        
+        <p>We are a passionate clothing brand that focuses on offering the best apparel for those who love to stay on top of fashion trends. Our team is committed to providing high-quality materials, innovative designs, and excellent customer service.</p>
+    
+        <h2>Our Mission</h2>
+        <p>At VibeWear, our mission is to deliver stylish and sustainable fashion for all individuals, empowering them to express their unique personalities through what they wear. We believe in creating clothing that blends comfort with high-end fashion, making you feel good inside and out.</p>
+    
+        <h2>Our Vision</h2>
+        <p>We envision VibeWear as a global leader in fashion, known for our trendsetting designs and commitment to sustainability. We strive to create a community of people who share a love for stylish, eco-friendly clothing.</p>
+    
+        <h2>Our Values</h2>
+        <ul>
+            <li><strong>Sustainability:</strong> We are committed to using eco-friendly materials in our clothing lines.</li>
+            <li><strong>Quality:</strong> Every product is crafted with the utmost care and attention to detail.</li>
+            <li><strong>Creativity:</strong> Our designs aim to push boundaries and express individuality.</li>
+            <li><strong>Customer Satisfaction:</strong> We prioritize our customers' happiness by offering excellent service and products.</li>
+        </ul>
+    
+        <h2>Meet Our Team</h2>
+        <div class="team">
+            <div class="team-member">
+                <img src="{% static 'home/team-member1.jpg' %}" alt="Team Member 1" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                <h3>John Doe</h3>
+                <p>Founder & CEO</p>
+                <p>John is passionate about creating fashion that is both sustainable and stylish. He leads our creative direction and ensures the quality of every product.</p>
+            </div>
+            <div class="team-member">
+                <img src="{% static 'home/team-member2.jpg' %}" alt="Team Member 2" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                <h3>Jane Smith</h3>
+                <p>Head of Design</p>
+                <p>Jane brings innovative ideas to the table, crafting designs that set the tone for our collections each season.</p>
+            </div>
+        </div>
+    
+        <h2>Our History</h2>
+        <p>Founded in 2020, VibeWear started with a simple goal: to provide high-quality, affordable, and stylish clothing to people who care about fashion. In just a few years, we've grown into a brand loved by fashion enthusiasts all over the world.</p>
+    
+        <h2>Join Us on Social Media</h2>
+        <p>Stay updated with the latest trends, offers, and collections by following us on our social media platforms:</p>
+        <ul class="social-media">
+            <li><a href="https://www.facebook.com/VibeWear" target="_blank">Facebook</a></li>
+            <li><a href="https://www.instagram.com/VibeWear" target="_blank">Instagram</a></li>
+            <li><a href="https://www.twitter.com/VibeWear" target="_blank">Twitter</a></li>
+            <li><a href="https://www.linkedin.com/company/vibewear" target="_blank">LinkedIn</a></li>
+        </ul>
+    </section>
+    
+</body>
+</html>

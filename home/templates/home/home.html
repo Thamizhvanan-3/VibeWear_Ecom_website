@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeWear - Home</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'home/style.css' %}">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="#"><img src="{% static 'home/good-vibes.png' %}" alt="VibeWear Logo" style="width: 30px; height: 30px;"></a>
+            <span>VibeWear</span>
+        </div>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#paginated-images">Shop</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="#">Welcome, {{ user.username }}</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+        
+                
+            {% endif %}
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+
+            {% endif %}
+
+        </ul>
+    </nav>
+
+    <div class="content">
+        <!-- Slideshow Section -->
+        <div class="slideshow-container">
+            <div class="slide fade">
+                <img src="{% static 'home/roihan-haidar-qkErKjD3jFQ-unsplash.jpg' %}" alt="Welcome to VibeWear">
+                <div class="text">Welcome to VibeWear</div>
+            </div>
+            <div class="slide fade">
+                <img src="{% static 'home/declan-sun-6D_1ODPb7Os-unsplash.jpg'%}" alt="Explore Trendy Fashion">
+                <div class="text">Explore Trendy Fashion</div>
+            </div>
+            <div class="slide fade">
+                <img src="{% static 'home/hugo-clement-JGtPrdnMgQc-unsplash.jpg' %}" alt="Shop Now for Best Deals">
+                <div class="text">Shop Now for Best Deals!</div>
+            </div>
+        </div>
+    </div>
+        <!-- Pagination Controls -->
+        <!-- Paginated Images Section -->
+<div class="paginated-images" id="paginated-images">
+    <h2>Explore More</h2>
+    <div class="image-grid">
+        {% for shirt in page_obj %}
+            <div class="image-item">
+                <img src="{% static 'home/'|add:shirt.image %}" alt="{{ shirt.name }}">
+                <h3>{{ shirt.name }}</h3>
+                <p>₹{{ shirt.price }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+</body>
+</html>
