@@ -38,16 +38,28 @@ if not SECRET_KEY:
         )
 
 ALLOWED_HOSTS = [
-  host.strip()
+    host.strip()
     for host in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
-        "localhost,127.0.0.1"
+        "vibewear-ecommerce-l75skvstd-thamizhvanan-g.vercel.app,vibewear-ecommerce.vercel.app,.vercel.app",
     ).split(",")
     if host.strip()
 ]
 
+# Ensure the production domain, localhost, and 127.0.0.1 are always preserved
+for host in (
+    "vibewear-ecommerce-l75skvstd-thamizhvanan-g.vercel.app",
+    ".vercel.app",
+    "localhost",
+    "127.0.0.1",
+):
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
 CSRF_TRUSTED_ORIGINS = [
     'https://vibewear-ecommerce.vercel.app',
+    'https://vibewear-ecommerce-l75skvstd-thamizhvanan-g.vercel.app',
+    'https://*.vercel.app',
 ]
 
 
