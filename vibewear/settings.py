@@ -15,13 +15,27 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-
-if not SECRET_KEY:
-    raise RuntimeError("DJANGO_SECRET_KEY is not configured")
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Debug is enabled for local development and disabled automatically on Vercel.
+# Set DJANGO_DEBUG=True/False to override explicitly.
+_debug_setting = os.environ.get('DJANGO_DEBUG')
+if _debug_setting is None:
+    DEBUG = 'VERCEL' not in os.environ
+else:
+    DEBUG = _debug_setting.strip().lower() in ('1', 'true', 'yes', 'on')
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# Read the key from the environment. A throwaway development key is used only
+# when DEBUG is enabled so local development works without extra setup.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '').strip()
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-vibewear-local-development-only'
+    else:
+        raise RuntimeError(
+            "DJANGO_SECRET_KEY environment variable is not set. "
+            "Configure it with a strong, unique value before deploying to production."
+        )
 
 ALLOWED_HOSTS = [
     'vibewear-ecommerce.vercel.app',
@@ -49,6 +63,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -126,6 +141,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'home/static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise serves compressed, cache-busted static files in production.
+# Local development uses Django's default storage so collectstatic is optional.
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if DEBUG
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
 
 # Media files (uploaded product and category images)
 MEDIA_URL = '/media/'
