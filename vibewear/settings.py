@@ -38,10 +38,12 @@ if not SECRET_KEY:
         )
 
 ALLOWED_HOSTS = [
-    'vibewear-ecommerce.vercel.app',
-    '.vercel.app',
-    'localhost',
-    '127.0.0.1',
+  host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
