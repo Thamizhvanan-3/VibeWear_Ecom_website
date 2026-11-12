@@ -1,0 +1,12 @@
+{% with current=request.resolver_match.url_name %}
+<aside class="vw-account-nav">
+    <h2>My Account</h2>
+    <a href="{% url 'dashboard' %}" class="{% if current == 'dashboard' %}is-active{% endif %}">Dashboard</a>
+    <a href="{% url 'profile' %}" class="{% if current == 'profile' %}is-active{% endif %}">My Profile</a>
+    <a href="{% url 'order_history' %}" class="{% if current == 'order_history' or current == 'order_detail' %}is-active{% endif %}">My Orders</a>
+    <a href="{% url 'address_list' %}" class="{% if current == 'address_list' or current == 'address_create' or current == 'address_edit' %}is-active{% endif %}">My Addresses</a>
+    <a href="{% url 'wishlist' %}" class="{% if current == 'wishlist' %}is-active{% endif %}">My Wishlist</a>
+    <a href="{% url 'change_password' %}" class="{% if current == 'change_password' %}is-active{% endif %}">Change Password</a>
+    <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+</aside>
+{% endwith %}

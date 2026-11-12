@@ -1,0 +1,124 @@
+{% extends 'home/base.html' %}
+{% block title %}{{ product.name }} - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-breadcrumbs">
+        <a href="{% url 'home' %}">Home</a> /
+        <a href="{% url 'shop' %}">Shop</a> /
+        <a href="{% url 'shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> /
+        {{ product.name }}
+    </div>
+
+    <div class="vw-product-detail">
+        <div>
+            {% with images=product.all_images %}
+                {% if images %}
+                    <div class="vw-gallery-main">
+                        <img id="gallery-main-image" src="{{ images.0.url }}" alt="{{ images.0.alt_text|default:product.name }}">
+                    </div>
+                    {% if images|length > 1 %}
+                        <div class="vw-gallery-thumbs">
+                            {% for image in images %}
+                                <img class="vw-gallery-thumb{% if forloop.first %} is-active{% endif %}"
+                                     data-gallery-src="{{ image.url }}"
+                                     src="{{ image.url }}"
+                                     alt="{{ image.alt_text|default:product.name }}">
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="vw-gallery-main vw-card-placeholder">VibeWear</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="vw-product-info">
+            <div class="vw-product-category">{{ product.category.name }}</div>
+            <h1>{{ product.name }}</h1>
+            <div class="vw-price-line">
+                <span class="now">₹{{ product.price }}</span>
+                {% if product.original_price and product.original_price > product.price %}
+                    <span class="was">₹{{ product.original_price }}</span>
+                    <span class="off">{{ product.discount_percent }}% off</span>
+                {% endif %}
+            </div>
+
+            <p class="vw-description">{{ product.description|default:'A considered addition to your everyday wardrobe.' }}</p>
+
+            <form method="POST" action="{% url 'add_to_cart' product.slug %}" data-variant-root>
+                {% csrf_token %}
+                {{ variant_data|json_script:"variant-data" }}
+
+                {% if variants %}
+                    <div class="vw-variant-block">
+                        <span class="vw-variant-label">Size</span>
+                        <div class="vw-variant-options" id="size-options" aria-label="Choose a size"></div>
+
+                        <span class="vw-variant-label">Colour</span>
+                        <div class="vw-variant-options" id="color-options" aria-label="Choose a colour"></div>
+
+                        <p class="vw-stock-line" id="variant-stock">Select a size and colour</p>
+
+                        <noscript>
+                            <div class="vw-field">
+                                <label for="variant-fallback">Size and colour</label>
+                                <select name="variant_id" id="variant-fallback" required>
+                                    {% for variant in variants %}
+                                        <option value="{{ variant.pk }}" {% if variant.stock <= 0 %}disabled{% endif %}>
+                                            {{ variant.size.name }} / {{ variant.color.name }}{% if variant.stock <= 0 %} (out of stock){% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </noscript>
+
+                        <input type="hidden" name="variant_id" id="variant-id" value="">
+                        <div class="vw-buy-row">
+                            <div class="vw-qty-inline">
+                                <input type="number" id="qty-input" name="quantity" value="1" min="1" max="10" aria-label="Quantity">
+                            </div>
+                            <button type="submit" class="vw-btn vw-btn-gold" id="add-to-cart-btn">Add to cart</button>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="vw-assurance">
+                        <p>This product is not available in any size or colour right now.</p>
+                    </div>
+                {% endif %}
+            </form>
+
+            {% if user.is_authenticated %}
+                <form method="POST" action="{% if in_wishlist %}{% url 'remove_from_wishlist' product.slug %}{% else %}{% url 'add_to_wishlist' product.slug %}{% endif %}" style="margin-top: 12px; max-width: none;">
+                    {% csrf_token %}
+                    <button type="submit" class="vw-btn {% if in_wishlist %}vw-btn-outline{% else %}vw-btn-dark{% endif %} vw-btn-sm">
+                        {% if in_wishlist %}♥ Remove from wishlist{% else %}♡ Save to wishlist{% endif %}
+                    </button>
+                </form>
+            {% else %}
+                <p style="margin-top: 12px;">
+                    <a class="vw-section-link" href="{% url 'login' %}?next={{ product.get_absolute_url|urlencode }}">Log in to save this product to your wishlist</a>
+                </p>
+            {% endif %}
+
+            <div class="vw-assurance">
+                <p><strong>Cash on Delivery</strong> available at checkout.</p>
+                <p>Free delivery on orders of ₹999 or more.</p>
+                <p>Easy order tracking from your VibeWear account.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="vw-home-section" style="margin-top: 46px; padding: 0;">
+        <h2>You may also like</h2>
+        <p class="vw-section-sub">More pieces from the same collection.</p>
+        <div class="vw-product-row">
+            {% for product in related_products %}
+                {% include 'home/_product_card.html' with product=product %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

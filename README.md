@@ -3,16 +3,22 @@
 VibeWear is an **e-commerce clothing website** built using Django. It provides a seamless shopping experience with user authentication, product listing, and essential e-commerce features.
 
 ## 🚀 Features
-- 🔐 **User Authentication:** Secure login and signup for new users.
-- 👤 **Account Management:** Users can manage their profiles.
-- 🛒 **Product Listing:** Displays a list of clothing products with pagination.
-- 🏪 **Shop Section:** Users can browse and explore various categories.
+- 🔐 **User Authentication:** Secure signup and login with either username or email. Duplicate usernames/emails are rejected case-insensitively.
+- 🔑 **Password Management:** Password reset by email and password change while logged in.
+- 👤 **Account Management:** Editable profile plus multiple saved delivery addresses.
+- 🛒 **Cart:** Guest carts are stored in the session and merged into the account cart after login. Quantities are validated against live stock.
+- 📦 **Checkout & Orders:** Cash-on-delivery checkout with server-side totals, transactional stock updates, order IDs, statuses, and order history.
+- 👕 **Product Catalog:** Categories and subcategories, multiple images, size/color/stock variants, and original/discounted pricing.
+- ⭐ **Merchandising:** Featured, new-arrival, and best-seller sections.
+- 🔍 **Shop Tools:** Search, category/size/color filters, sorting, and pagination.
+- ❤️ **Wishlist:** Save products and move them to the cart later.
+- 📊 **Admin Dashboard:** Sales/order statistics, low-stock alerts, inline product images/variants, and order status actions.
 - 📞 **About & Contact Section:** Provides details about the business and a way to contact support.
 
 ## 🛠️ Technologies Used
-- 🖥️ **Backend:** Django (Python)
+- 🖥️ **Backend:** Django 6.0 (Python)
 - 🎨 **Frontend:** HTML, CSS, JavaScript
-- 🗄️ **Database:** MySQL
+- 🗄️ **Database:** SQLite (development default)
 
 ## 📌 Installation
 1. **Clone the repository:**
@@ -33,6 +39,7 @@ VibeWear is an **e-commerce clothing website** built using Django. It provides a
    ```sh
    python manage.py migrate
    ```
+   This also seeds the starter catalog and user profiles without deleting existing rows.
 5. **Create a superuser:**
    ```sh
    python manage.py createsuperuser
@@ -42,16 +49,23 @@ VibeWear is an **e-commerce clothing website** built using Django. It provides a
    python manage.py runserver
    ```
 
+> **Notes**
+> - Uploaded product images are stored in `media/` and served automatically in development.
+> - Password-reset emails use Django's console backend in development, so the reset link is printed in the terminal.
+> - Run the test suite with `python manage.py test`.
+
 ## 🎯 Usage
 - Open `http://127.0.0.1:8000/` in your browser.
-- 🔑 Register or log in to start shopping.
-- 🛍️ Browse products and manage your account.
+- 🔑 Register or log in to start shopping. Items added as a guest are kept when you log in.
+- 🛍️ Browse the shop, filter by category/size/color, and add products to your cart or wishlist.
+- 📦 Check out with cash on delivery and follow your order from the dashboard.
+- 🛠️ Manage the catalog, stock, and orders from `/admin/`.
 
 ## 🔮 Future Enhancements
-- 🛍️ Implement a **shopping cart** and checkout system.
-- 💳 Add **payment gateway** integration.
-- 🎨 Improve **UI/UX** with advanced styling.
-- 🔍 Enable **product search and filtering**.
+- 💳 Add **online payment gateway** integration.
+- 🚚 Add shipment tracking and delivery integrations.
+- 📧 Send order confirmation emails.
+- 🌍 Add multi-currency and international shipping support.
 
 ## 📜 License
 This project is open-source and available under the **MIT License**.

@@ -1,0 +1,91 @@
+{% extends 'home/base.html' %}
+{% block title %}{{ title }} - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>{{ title }}</h1>
+            <p>We only use this address for delivering your orders.</p>
+        </div>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+        <div class="vw-panel">
+            <div class="vw-panel-head">
+                <h2>Address details</h2>
+                <a href="{% url 'address_list' %}">Back to addresses</a>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="vw-errorlist">{{ form.non_field_errors }}</ul>
+                {% endif %}
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.full_name.id_for_label }}">Full name</label>
+                        {{ form.full_name }}
+                        {{ form.full_name.errors }}
+                    </div>
+                    <div class="vw-field">
+                        <label for="{{ form.phone.id_for_label }}">Phone</label>
+                        {{ form.phone }}
+                        {{ form.phone.errors }}
+                    </div>
+                </div>
+                <div class="vw-field">
+                    <label for="{{ form.address_line1.id_for_label }}">Address line 1</label>
+                    {{ form.address_line1 }}
+                    {{ form.address_line1.errors }}
+                </div>
+                <div class="vw-field">
+                    <label for="{{ form.address_line2.id_for_label }}">Address line 2 (optional)</label>
+                    {{ form.address_line2 }}
+                    {{ form.address_line2.errors }}
+                </div>
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.city.id_for_label }}">City</label>
+                        {{ form.city }}
+                        {{ form.city.errors }}
+                    </div>
+                    <div class="vw-field">
+                        <label for="{{ form.state.id_for_label }}">State</label>
+                        {{ form.state }}
+                        {{ form.state.errors }}
+                    </div>
+                </div>
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.postal_code.id_for_label }}">Postal code</label>
+                        {{ form.postal_code }}
+                        {{ form.postal_code.errors }}
+                    </div>
+                    <div class="vw-field">
+                        <label for="{{ form.country.id_for_label }}">Country</label>
+                        {{ form.country }}
+                        {{ form.country.errors }}
+                    </div>
+                </div>
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.label.id_for_label }}">Address label (optional)</label>
+                        {{ form.label }}
+                        {{ form.label.errors }}
+                    </div>
+                    <div class="vw-field vw-check-inline" style="display:flex; align-items:center; gap:8px; padding-top:22px;">
+                        {{ form.is_default }}
+                        <label for="{{ form.is_default.id_for_label }}" style="margin:0;">Use as my default address</label>
+                    </div>
+                </div>
+                <div class="vw-summary-actions" style="max-width: 300px;">
+                    <button type="submit" class="vw-btn vw-btn-gold">Save address</button>
+                    <a class="vw-btn vw-btn-outline" href="{% url 'address_list' %}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

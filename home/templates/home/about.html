@@ -6,19 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - VibeWear</title>
     <link rel="stylesheet" href="{% static 'home/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/shop.css' %}">
 </head>
 <body>
-    <nav>
-        <div class="logo">
-            <a href="#"><img src="{% static 'home/good-vibes.png' %}" alt="VibeWear Logo" style="width: 30px; height: 30px;"></a>
-            <span>VibeWear</span>
-        </div>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-        </ul>
-    </nav>
+    {% include 'home/_nav.html' %}
+    {% include 'home/_messages.html' %}
 
     <section id="about">
         <h1>About VibeWear</h1>

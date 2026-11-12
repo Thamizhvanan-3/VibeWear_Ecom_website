@@ -1,0 +1,85 @@
+{% extends 'home/base.html' %}
+{% block title %}Your Cart - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    {% if items %}
+        <div class="vw-page-head">
+            <div>
+                <h1>Your Cart</h1>
+                <p>{{ cart.total_quantity }} item{{ cart.total_quantity|pluralize }} ready for checkout.</p>
+            </div>
+            <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'shop' %}">Continue shopping</a>
+        </div>
+
+        <div class="vw-cart-layout">
+            <div class="vw-cart-items">
+                {% for item in items %}
+                <div class="vw-cart-item">
+                    <a class="vw-cart-image" href="{{ item.product.get_absolute_url }}">
+                        {% with image=item.product.primary_image %}
+                            {% if image %}<img src="{{ image.url }}" alt="{{ item.product.name }}">{% else %}<div class="vw-card-placeholder">VW</div>{% endif %}
+                        {% endwith %}
+                    </a>
+                    <div class="vw-cart-info">
+                        <h3><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></h3>
+                        <p class="vw-cart-meta">Size: {{ item.variant.size.name }} · Colour: {{ item.variant.color.name }}</p>
+                        <p class="vw-cart-meta">₹{{ item.unit_price }} each</p>
+                        <p class="vw-cart-meta">{% if item.variant.stock <= 5 %}Only {{ item.variant.stock }} left in stock{% else %}In stock{% endif %}</p>
+                    </div>
+                    <div class="vw-cart-actions">
+                        <div class="vw-line-price">₹{{ item.subtotal }}</div>
+                        <form class="vw-qty-form" method="POST" action="{% url 'update_cart_item' item.pk %}" data-qty-form>
+                            {% csrf_token %}
+                            <button type="button" class="vw-qty-btn" data-qty-step="-1" aria-label="Decrease quantity">−</button>
+                            <input class="vw-qty-input" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{% if item.variant.stock > 10 %}10{% else %}{{ item.variant.stock }}{% endif %}" aria-label="Quantity for {{ item.product.name }}">
+                            <button type="button" class="vw-qty-btn" data-qty-step="1" aria-label="Increase quantity">+</button>
+                            <noscript><button type="submit" class="vw-btn vw-btn-outline vw-btn-sm">Update</button></noscript>
+                        </form>
+                        <form method="POST" action="{% url 'remove_cart_item' item.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="vw-link-button">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <aside class="vw-summary-card">
+                <h2>Order summary</h2>
+                <div class="vw-summary-row"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
+                <div class="vw-summary-row">
+                    <span>Delivery</span>
+                    <span>{% if shipping_fee %}₹{{ shipping_fee }}{% else %}Free{% endif %}</span>
+                </div>
+                <div class="vw-summary-row total"><span>Total</span><span>₹{{ total }}</span></div>
+                {% if shipping_fee %}
+                    <div class="vw-free-ship-hint">Add ₹999 or more to your order to unlock free delivery.</div>
+                {% else %}
+                    <div class="vw-free-ship-hint">Free delivery applied to this order.</div>
+                {% endif %}
+                <div class="vw-summary-actions">
+                    {% if user.is_authenticated %}
+                        <a class="vw-btn vw-btn-gold vw-btn-block" href="{% url 'checkout' %}">Proceed to checkout</a>
+                    {% else %}
+                        <a class="vw-btn vw-btn-gold vw-btn-block" href="{% url 'login' %}?next={% url 'checkout' %}">Login to checkout</a>
+                        <p class="vw-muted" style="text-align:center;">Your cart will be saved when you log in.</p>
+                    {% endif %}
+                    <a class="vw-btn vw-btn-outline vw-btn-block" href="{% url 'shop' %}">Continue shopping</a>
+                </div>
+                <p class="vw-muted" style="text-align:center; margin-top:12px;">Cash on Delivery · Secure checkout</p>
+            </aside>
+        </div>
+    {% else %}
+        <div class="vw-empty-cart">
+            <div class="vw-empty-icon" aria-hidden="true">🛍️</div>
+            <h1>Your cart is empty</h1>
+            <p>Looks like you haven't added anything yet. Explore the latest VibeWear pieces and find something you love.</p>
+            <a class="vw-btn vw-btn-gold" href="{% url 'shop' %}">Start shopping</a>
+            {% if user.is_authenticated %}
+                <p style="margin-top: 18px;"><a class="vw-section-link" href="{% url 'wishlist' %}">View your wishlist</a></p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment files
+.env
+.env.*
+
+# Uploaded media (served locally in development)
+media/
+
+# Large video recordings (keep them out of Git)
+*.mp4
+
+# Editor / OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

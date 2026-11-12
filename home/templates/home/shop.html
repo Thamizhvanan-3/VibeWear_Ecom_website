@@ -1,0 +1,127 @@
+{% extends 'home/base.html' %}
+{% block title %}Shop - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>{% if selected_category %}{{ selected_category.name }}{% else %}Shop{% endif %}</h1>
+            <p>{% if query %}Results for “{{ query }}”{% else %}Find your next favourite piece from the VibeWear collection.{% endif %}</p>
+        </div>
+        <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'shop' %}">Clear all filters</a>
+    </div>
+
+    <div class="vw-shop-layout">
+        <aside>
+            <form class="vw-filter-card" method="GET" action="{% url 'shop' %}">
+                <h2>Filters</h2>
+                <div class="vw-filter-group">
+                    <label for="filter-q">Search</label>
+                    <input type="search" id="filter-q" name="q" value="{{ query }}" placeholder="Shirt, jacket...">
+                </div>
+                <div class="vw-filter-group">
+                    <label for="filter-category">Category</label>
+                    <select id="filter-category" name="category">
+                        <option value="">All categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.slug }}" {% if category_slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                            {% for child in category.children.all %}
+                                <option value="{{ child.slug }}" {% if category_slug == child.slug %}selected{% endif %}>&nbsp;&nbsp;{{ child.name }}</option>
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="vw-filter-group">
+                    <label for="filter-size">Size</label>
+                    <select id="filter-size" name="size">
+                        <option value="">Any size</option>
+                        {% for size in sizes %}
+                            <option value="{{ size.name }}" {% if size_name == size.name %}selected{% endif %}>{{ size.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="vw-filter-group">
+                    <label for="filter-color">Colour</label>
+                    <select id="filter-color" name="color">
+                        <option value="">Any colour</option>
+                        {% for color in colors %}
+                            <option value="{{ color.name }}" {% if color_name == color.name %}selected{% endif %}>{{ color.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="vw-filter-group">
+                    <label>Price range (₹)</label>
+                    <div class="vw-price-row">
+                        <input type="number" name="min_price" min="0" step="1" value="{{ min_price }}" placeholder="Min" aria-label="Minimum price">
+                        <input type="number" name="max_price" min="0" step="1" value="{{ max_price }}" placeholder="Max" aria-label="Maximum price">
+                    </div>
+                </div>
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <div class="vw-filter-actions">
+                    <button type="submit" class="vw-btn vw-btn-dark">Apply filters</button>
+                    <a class="vw-clear-link" href="{% url 'shop' %}">Reset filters</a>
+                </div>
+            </form>
+        </aside>
+
+        <div>
+            <div class="vw-shop-toolbar">
+                <p class="vw-result-count">
+                    {{ total_results }} product{{ total_results|pluralize }}
+                    {% if active_filter_count %}· {{ active_filter_count }} filter{{ active_filter_count|pluralize }} active{% endif %}
+                </p>
+                <form method="GET" action="{% url 'shop' %}">
+                    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                    {% if category_slug %}<input type="hidden" name="category" value="{{ category_slug }}">{% endif %}
+                    {% if size_name %}<input type="hidden" name="size" value="{{ size_name }}">{% endif %}
+                    {% if color_name %}<input type="hidden" name="color" value="{{ color_name }}">{% endif %}
+                    {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+                    {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+                    <label for="sort-select">Sort by</label>
+                    <select id="sort-select" name="sort" data-auto-submit>
+                        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Popularity</option>
+                        <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: low to high</option>
+                        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: high to low</option>
+                        <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+                    </select>
+                </form>
+            </div>
+
+            {% if page_obj.object_list %}
+                <div class="vw-product-grid">
+                    {% for product in page_obj %}
+                        {% include 'home/_product_card.html' with product=product %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="vw-empty-state">
+                    <h2>No products found</h2>
+                    <p>Try a different search, size, colour or price range.</p>
+                    <a class="vw-btn vw-btn-gold" href="{% url 'shop' %}">Browse all products</a>
+                </div>
+            {% endif %}
+
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="vw-pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?{% if base_query %}{{ base_query }}&{% endif %}page=1">First</a>
+                    <a href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+                {% for number in page_obj.paginator.page_range %}
+                    {% if number == page_obj.number %}
+                        <span class="current">{{ number }}</span>
+                    {% elif number > page_obj.number|add:"-3" and number < page_obj.number|add:"3" %}
+                        <a href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ number }}">{{ number }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <a href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?{% if base_query %}{{ base_query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Last</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

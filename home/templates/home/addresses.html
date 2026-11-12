@@ -1,0 +1,54 @@
+{% extends 'home/base.html' %}
+{% block title %}My Addresses - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>My Addresses</h1>
+            <p>Save delivery locations for a faster checkout.</p>
+        </div>
+        <a class="vw-btn vw-btn-gold vw-btn-sm" href="{% url 'address_create' %}">+ Add address</a>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+        <div>
+            {% if addresses %}
+                <div class="vw-address-grid">
+                    {% for address in addresses %}
+                        <div class="vw-address-card{% if address.is_default %} is-default{% endif %}">
+                            {% if address.is_default %}<span class="default-tag">Default</span>{% endif %}
+                            <h3>{{ address.full_name }}{% if address.label %} <span class="vw-muted">· {{ address.label }}</span>{% endif %}</h3>
+                            <p>{{ address.address_line1 }}</p>
+                            {% if address.address_line2 %}<p>{{ address.address_line2 }}</p>{% endif %}
+                            <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                            <p>{{ address.country }}</p>
+                            <p>Phone: {{ address.phone }}</p>
+                            <div class="vw-address-actions">
+                                <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'address_edit' address.pk %}">Edit</a>
+                                {% if not address.is_default %}
+                                    <form method="POST" action="{% url 'address_set_default' address.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="vw-btn vw-btn-dark vw-btn-sm">Set default</button>
+                                    </form>
+                                {% endif %}
+                                <form method="POST" action="{% url 'address_delete' address.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="vw-btn vw-btn-danger vw-btn-sm" onclick="return confirm('Remove this delivery address?');">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="vw-empty-state">
+                    <h2>No saved addresses</h2>
+                    <p>Add an address to speed up checkout next time.</p>
+                    <a class="vw-btn vw-btn-gold" href="{% url 'address_create' %}">Add delivery address</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

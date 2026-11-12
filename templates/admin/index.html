@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_stats %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+  <style>
+    .vw-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 20px; }
+    .vw-stat { background: #fff; border: 1px solid #e3e3e3; border-left: 4px solid #b31414; border-radius: 6px; padding: 12px 14px; }
+    .vw-stat strong { display: block; font-size: 22px; color: #1a1a1a; line-height: 1.2; }
+    .vw-stat span { color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .vw-lowstock { background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; }
+    .vw-lowstock h2 { margin-top: 0; font-size: 14px; }
+    .vw-lowstock table { width: 100%; border-collapse: collapse; }
+    .vw-lowstock th, .vw-lowstock td { text-align: left; padding: 6px 4px; border-bottom: 1px solid #eee; font-size: 12px; }
+    .vw-lowstock .warn { color: #b31414; font-weight: 600; }
+  </style>
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+{% admin_dashboard_stats as stats %}
+<div class="vw-stats">
+  <div class="vw-stat"><strong>{{ stats.product_count }}</strong><span>Products ({{ stats.active_product_count }} active)</span></div>
+  <div class="vw-stat"><strong>{{ stats.customer_count }}</strong><span>Customers</span></div>
+  <div class="vw-stat"><strong>{{ stats.order_count }}</strong><span>Orders</span></div>
+  <div class="vw-stat"><strong>₹{{ stats.revenue|floatformat:2 }}</strong><span>Sales (excl. cancelled)</span></div>
+  <div class="vw-stat"><strong>{{ stats.pending_order_count }}</strong><span>Open / pending orders</span></div>
+  <div class="vw-stat"><strong>{{ stats.low_stock_count }}</strong><span>Low stock variants</span></div>
+  <div class="vw-stat"><strong>{{ stats.out_of_stock_count }}</strong><span>Out of stock</span></div>
+</div>
+
+<div class="vw-lowstock">
+  <h2>Low stock alerts ({{ stats.low_stock_threshold }} or fewer units)</h2>
+  {% if stats.low_stock_variants %}
+    <table>
+      <thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>Stock</th></tr></thead>
+      <tbody>
+        {% for variant in stats.low_stock_variants %}
+          <tr>
+            <td><a href="{% url 'admin:home_product_change' variant.product_id %}">{{ variant.product.name }}</a></td>
+            <td>{{ variant.size.name }}</td>
+            <td>{{ variant.color.name }}</td>
+            <td class="warn">{{ variant.stock }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>All variants are above the low-stock threshold.</p>
+  {% endif %}
+</div>
+
+<div id="content-main" class="app-list">
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% translate 'Recent actions' %}</h2>
+        <h3>{% translate 'My actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as admin_log for_user user %}
+        {% if not admin_log %}
+        <p>{% translate 'None available' %}</p>
+        {% else %}
+        <ul class="actionlist">
+        {% for entry in admin_log %}
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                <span class="visually-hidden">{% if entry.is_addition %}{% translate 'Added:' %}{% elif entry.is_change %}{% translate 'Changed:' %}{% elif entry.is_deletion %}{% translate 'Deleted:' %}{% endif %}</span>
+                {% if entry.is_deletion or not entry.get_admin_url %}
+                    {{ entry.object_repr }}
+                {% else %}
+                    <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                {% endif %}
+                <br>
+                {% if entry.content_type %}
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
+                {% else %}
+                    <span class="mini quiet">{% translate 'Unknown content' %}</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

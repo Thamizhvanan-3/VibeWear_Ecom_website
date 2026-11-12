@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VibeWear{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'home/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'home/shop.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% include 'home/_nav.html' %}
+    {% include 'home/_messages.html' %}
+    <main class="vw-main">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="vw-footer">
+        <div class="vw-footer-inner">
+            <p><strong>VibeWear</strong> — style that feels good.</p>
+            <p>Secure checkout · Cash on Delivery · Easy order tracking</p>
+        </div>
+    </footer>
+    <script src="{% static 'home/shop.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

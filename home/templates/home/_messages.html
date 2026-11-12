@@ -1,0 +1,7 @@
+{% if messages %}
+<div class="vw-messages" role="status" aria-live="polite">
+    {% for message in messages %}
+        <div class="vw-message vw-message-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}

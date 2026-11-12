@@ -1,0 +1,54 @@
+{% extends 'home/base.html' %}
+{% block title %}My Orders - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>My Orders</h1>
+            <p>Track deliveries and review your VibeWear purchases.</p>
+        </div>
+        <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'shop' %}">Continue shopping</a>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+        <div>
+            {% if page_obj.object_list %}
+                <div class="vw-order-list">
+                    {% for order in page_obj %}
+                        <div class="vw-order-card">
+                            <div class="vw-order-card-head">
+                                <div>
+                                    <div class="vw-order-number">{{ order.order_number }}</div>
+                                    <div class="vw-order-date">Placed {{ order.created_at|date:"d M Y, h:i A" }}</div>
+                                </div>
+                                <span class="vw-status vw-status-{{ order.status }}">{{ order.get_status_display }}</span>
+                            </div>
+                            <div class="vw-order-card-body">
+                                <span>{{ order.items.count }} item{{ order.items.count|pluralize }} · <strong>₹{{ order.total }}</strong></span>
+                                <span>Cash on Delivery</span>
+                                <a class="vw-section-link" href="{% url 'order_detail' order.order_number %}">View details &rarr;</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                <div class="vw-pagination">
+                    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+                    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="vw-empty-state">
+                    <h2>No orders yet</h2>
+                    <p>When you place an order, it will appear here with live status updates.</p>
+                    <a class="vw-btn vw-btn-gold" href="{% url 'shop' %}">Start shopping</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

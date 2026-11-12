@@ -1,0 +1,65 @@
+{% extends 'home/base.html' %}
+{% block title %}My Profile - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>My Profile</h1>
+            <p>Keep your contact details up to date for smooth deliveries.</p>
+        </div>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+        <div class="vw-panel">
+            <div class="vw-panel-head">
+                <h2>Personal details</h2>
+                <a href="{% url 'change_password' %}">Change password</a>
+            </div>
+
+            <p class="vw-muted" style="margin-bottom:16px;"><strong>Username:</strong> {{ user.username }} <span style="margin-left:8px;">(usernames cannot be changed)</span></p>
+
+            <form method="POST" action="{% url 'profile' %}">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <ul class="vw-errorlist">{{ form.non_field_errors }}</ul>
+                {% endif %}
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.first_name.id_for_label }}">First name</label>
+                        {{ form.first_name }}
+                        {{ form.first_name.errors }}
+                    </div>
+                    <div class="vw-field">
+                        <label for="{{ form.last_name.id_for_label }}">Last name</label>
+                        {{ form.last_name }}
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+                <div class="vw-form-row">
+                    <div class="vw-field">
+                        <label for="{{ form.email.id_for_label }}">Email address</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    <div class="vw-field">
+                        <label for="{{ form.phone.id_for_label }}">Phone number</label>
+                        {{ form.phone }}
+                        {{ form.phone.errors }}
+                    </div>
+                </div>
+                <div class="vw-field" style="max-width: 320px;">
+                    <label for="{{ form.date_of_birth.id_for_label }}">Date of birth (optional)</label>
+                    {{ form.date_of_birth }}
+                    {{ form.date_of_birth.errors }}
+                </div>
+                <div class="vw-summary-actions" style="max-width: 300px;">
+                    <button type="submit" class="vw-btn vw-btn-gold">Save changes</button>
+                    <a class="vw-btn vw-btn-outline" href="{% url 'dashboard' %}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

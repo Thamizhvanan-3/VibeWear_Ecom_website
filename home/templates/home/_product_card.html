@@ -1,0 +1,26 @@
+{% load static %}
+<div class="image-item vw-product-card">
+    <a class="vw-card-media" href="{{ product.get_absolute_url }}">
+        {% with image=product.primary_image %}
+            {% if image %}
+                <img src="{{ image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="vw-card-placeholder">VibeWear</div>
+            {% endif %}
+        {% endwith %}
+        {% if product.discount_percent %}
+            <span class="vw-discount-badge">-{{ product.discount_percent }}%</span>
+        {% endif %}
+        {% if not product.in_stock %}
+            <span class="vw-oos-badge">Out of stock</span>
+        {% endif %}
+    </a>
+    <h3><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+    <p class="product-price">
+        ₹{{ product.price }}
+        {% if product.original_price and product.original_price > product.price %}
+            <span class="vw-old-price">₹{{ product.original_price }}</span>
+        {% endif %}
+    </p>
+    <p class="vw-card-category">{{ product.category.name }}</p>
+</div>

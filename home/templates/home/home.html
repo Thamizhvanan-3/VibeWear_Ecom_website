@@ -6,32 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeWear - Home</title>
     <link rel="stylesheet" type="text/css" href="{% static 'home/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'home/shop.css' %}">
 </head>
 <body>
-    <nav>
-        <div class="logo">
-            <a href="#"><img src="{% static 'home/good-vibes.png' %}" alt="VibeWear Logo" style="width: 30px; height: 30px;"></a>
-            <span>VibeWear</span>
-        </div>
-        <ul>
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#paginated-images">Shop</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-            {% if user.is_authenticated %}
-                <li><a href="#">Welcome, {{ user.username }}</a></li>
-            {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-        
-                
-            {% endif %}
-            {% if user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-
-            {% endif %}
-
-        </ul>
-    </nav>
+    {% include 'home/_nav.html' %}
+    {% include 'home/_messages.html' %}
 
     <div class="content">
         <!-- Slideshow Section -->
@@ -50,37 +29,68 @@
             </div>
         </div>
     </div>
-        <!-- Pagination Controls -->
-        <!-- Paginated Images Section -->
-<div class="paginated-images" id="paginated-images">
-    <h2>Explore More</h2>
-    <div class="image-grid">
-        {% for shirt in page_obj %}
-            <div class="image-item">
-                <img src="{% static 'home/'|add:shirt.image %}" alt="{{ shirt.name }}">
-                <h3>{{ shirt.name }}</h3>
-                <p>₹{{ shirt.price }}</p>
-            </div>
+
+    {% if categories %}
+    <div class="vw-category-strip">
+        {% for category in categories %}
+            <a class="vw-category-chip" href="{% url 'shop' %}?category={{ category.slug }}">{{ category.name }} <span>{{ category.product_count }}</span></a>
         {% endfor %}
     </div>
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?page=1">&laquo; First</a>
-                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            {% endif %}
-    
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    {% endif %}
+
+    <div class="paginated-images" id="paginated-images">
+        <h2>Explore More</h2>
+        <div class="image-grid">
+            {% for product in page_obj %}
+                {% include 'home/_product_card.html' with product=product %}
+            {% empty %}
+                <p>No products are available yet. Please check back soon.</p>
+            {% endfor %}
+        </div>
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
             </span>
-    
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-            {% endif %}
-        </span>
+        </div>
     </div>
-</div>
+
+    {% if new_arrivals %}
+    <section class="vw-home-section">
+        <h2>New Arrivals</h2>
+        <p class="vw-section-sub">Fresh drops, just added to the collection.</p>
+        <div class="vw-product-row">
+            {% for product in new_arrivals %}
+                {% include 'home/_product_card.html' with product=product %}
+            {% endfor %}
+        </div>
+        <p style="margin-top: 18px;"><a class="vw-section-link" href="{% url 'shop' %}?sort=newest">View all new arrivals &rarr;</a></p>
+    </section>
+    {% endif %}
+
+    {% if best_sellers %}
+    <section class="vw-home-section">
+        <h2>Best Sellers</h2>
+        <p class="vw-section-sub">The pieces our customers keep coming back for.</p>
+        <div class="vw-product-row">
+            {% for product in best_sellers %}
+                {% include 'home/_product_card.html' with product=product %}
+            {% endfor %}
+        </div>
+        <p style="margin-top: 18px;"><a class="vw-section-link" href="{% url 'shop' %}?sort=popular">Shop best sellers &rarr;</a></p>
+    </section>
+    {% endif %}
 </body>
 </html>

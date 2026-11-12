@@ -1,0 +1,95 @@
+{% extends 'home/base.html' %}
+{% block title %}Order {{ order.order_number }} - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    {% if just_placed %}
+        <div class="vw-success-banner">
+            <h2>Thank you — your order is confirmed!</h2>
+            <p>Order <strong>{{ order.order_number }}</strong> has been placed. Pay ₹{{ order.total }} in cash when it arrives.</p>
+        </div>
+    {% endif %}
+
+    <div class="vw-order-detail-head">
+        <div>
+            <h1>Order {{ order.order_number }}</h1>
+            <p class="vw-muted">Placed on {{ order.created_at|date:"d M Y, h:i A" }} · {{ order.get_payment_method_display }}</p>
+        </div>
+        <div style="text-align:right;">
+            <span class="vw-status vw-status-{{ order.status }}">{{ order.get_status_display }}</span>
+            <p class="vw-muted" style="margin-top:6px;">Total <strong style="color:#222;">₹{{ order.total }}</strong></p>
+        </div>
+    </div>
+
+    {% if order.status == 'cancelled' %}
+        <div class="vw-cancelled-banner">
+            This order was cancelled. Any reserved stock has been returned to inventory.
+        </div>
+    {% else %}
+        <div class="vw-timeline">
+            {% for step in timeline %}
+                <div class="vw-timeline-step{% if step.done %} done{% endif %}{% if step.current %} current{% endif %}">
+                    <span class="dot"></span>
+                    {{ step.label }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="vw-order-grid">
+        <div>
+            <div class="vw-order-items">
+                {% for item in order.items.all %}
+                    <div class="vw-order-item">
+                        {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.product_name }}">
+                        {% else %}
+                            <div class="vw-card-placeholder" style="height:64px; width:64px; font-size:9px;">VW</div>
+                        {% endif %}
+                        <div>
+                            <div class="name">
+                                {% if item.product %}<a href="{{ item.product.get_absolute_url }}" style="color:#222; text-decoration:none;">{{ item.product_name }}</a>{% else %}{{ item.product_name }}{% endif %}
+                            </div>
+                            <div class="meta">{{ item.size_name }} / {{ item.color_name }} · Qty {{ item.quantity }} · ₹{{ item.unit_price }} each</div>
+                        </div>
+                        <div class="amount">₹{{ item.subtotal }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="vw-card" style="margin-top:18px;">
+                <h2>Order totals</h2>
+                <div class="vw-summary-row"><span>Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+                <div class="vw-summary-row"><span>Delivery</span><span>{% if order.shipping_fee %}₹{{ order.shipping_fee }}{% else %}Free{% endif %}</span></div>
+                <div class="vw-summary-row total"><span>Total</span><span>₹{{ order.total }}</span></div>
+                {% if order.notes %}
+                    <p class="vw-muted" style="margin-top:14px;"><strong>Delivery instructions:</strong> {{ order.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <aside>
+            <div class="vw-address-panel">
+                <h2>Delivery address</h2>
+                <p><strong>{{ order.full_name }}</strong></p>
+                <p>{{ order.address_line1 }}</p>
+                {% if order.address_line2 %}<p>{{ order.address_line2 }}</p>{% endif %}
+                <p>{{ order.city }}, {{ order.state }} {{ order.postal_code }}</p>
+                <p>{{ order.country }}</p>
+                <p>Phone: {{ order.phone }}</p>
+            </div>
+
+            <div class="vw-summary-actions">
+                <a class="vw-btn vw-btn-outline vw-btn-block" href="{% url 'order_history' %}">All my orders</a>
+                {% if order.can_cancel %}
+                    <form method="POST" action="{% url 'cancel_order' order.order_number %}">
+                        {% csrf_token %}
+                        <button type="submit" class="vw-btn vw-btn-danger vw-btn-block" onclick="return confirm('Cancel this order? Reserved stock will be released.');">Cancel order</button>
+                    </form>
+                {% endif %}
+                <a class="vw-btn vw-btn-gold vw-btn-block" href="{% url 'shop' %}">Continue shopping</a>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

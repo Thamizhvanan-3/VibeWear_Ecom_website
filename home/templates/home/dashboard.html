@@ -1,0 +1,88 @@
+{% extends 'home/base.html' %}
+{% block title %}My Account - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>Welcome, {{ user.first_name|default:user.username }}</h1>
+            <p>Manage your profile, deliveries and orders in one place.</p>
+        </div>
+        <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'shop' %}">Continue shopping</a>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+
+        <div>
+            <div class="vw-stat-grid">
+                <div class="vw-stat-card"><strong>{{ stats.orders }}</strong><span>Total orders</span></div>
+                <div class="vw-stat-card"><strong>{{ stats.pending }}</strong><span>Active orders</span></div>
+                <div class="vw-stat-card"><strong>₹{{ stats.spent }}</strong><span>Total spent</span></div>
+                <div class="vw-stat-card"><strong>{{ stats.wishlist }}</strong><span>Wishlist items</span></div>
+                <div class="vw-stat-card"><strong>{{ stats.addresses }}</strong><span>Saved addresses</span></div>
+            </div>
+
+            <div class="vw-panel">
+                <div class="vw-panel-head">
+                    <h2>Recent orders</h2>
+                    <a href="{% url 'order_history' %}">View all</a>
+                </div>
+                {% if recent_orders %}
+                    <table class="vw-mini-table">
+                        <thead>
+                            <tr><th>Order</th><th>Date</th><th>Status</th><th>Total</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr>
+                                    <td>{{ order.order_number }}</td>
+                                    <td>{{ order.created_at|date:"d M Y" }}</td>
+                                    <td><span class="vw-status vw-status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                                    <td>₹{{ order.total }}</td>
+                                    <td><a class="vw-section-link" href="{% url 'order_detail' order.order_number %}">View</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="vw-muted">You haven't placed an order yet. <a class="vw-section-link" href="{% url 'shop' %}">Explore the collection</a>.</p>
+                {% endif %}
+            </div>
+
+            <div class="vw-panel">
+                <div class="vw-panel-head">
+                    <h2>Profile</h2>
+                    <a href="{% url 'profile' %}">Edit profile</a>
+                </div>
+                <p class="vw-muted" style="margin:0 0 6px;"><strong>Username:</strong> {{ user.username }}</p>
+                <p class="vw-muted" style="margin:0 0 6px;"><strong>Email:</strong> {{ user.email|default:"Not added yet" }}</p>
+                <p class="vw-muted" style="margin:0 0 6px;"><strong>Name:</strong> {{ user.get_full_name|default:"Not added yet" }}</p>
+                <p class="vw-muted" style="margin:0;"><strong>Phone:</strong> {{ user.profile.phone|default:"Not added yet" }}</p>
+            </div>
+
+            <div class="vw-panel">
+                <div class="vw-panel-head">
+                    <h2>Delivery addresses</h2>
+                    <a href="{% url 'address_list' %}">Manage addresses</a>
+                </div>
+                {% if recent_addresses %}
+                    <div class="vw-address-grid">
+                        {% for address in recent_addresses %}
+                            <div class="vw-address-card{% if address.is_default %} is-default{% endif %}">
+                                {% if address.is_default %}<span class="default-tag">Default</span>{% endif %}
+                                <h3>{{ address.full_name }}</h3>
+                                <p>{{ address.address_line1 }}</p>
+                                <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                                <p>{{ address.phone }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="vw-muted">No saved addresses yet. <a class="vw-section-link" href="{% url 'address_create' %}">Add a delivery address</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

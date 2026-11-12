@@ -1,0 +1,64 @@
+{% extends 'home/base.html' %}
+{% block title %}My Wishlist - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>My Wishlist</h1>
+            <p>Saved pieces you're thinking about.</p>
+        </div>
+        <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'shop' %}">Continue shopping</a>
+    </div>
+
+    <div class="vw-account-layout">
+        {% include 'home/_account_nav.html' %}
+        <div>
+            {% if wishlist_items %}
+                <div class="vw-wishlist-grid">
+                    {% for item in wishlist_items %}
+                        <div class="vw-wishlist-card">
+                            <a href="{{ item.product.get_absolute_url }}">
+                                {% with image=item.product.primary_image %}
+                                    {% if image %}<img src="{{ image.url }}" alt="{{ item.product.name }}">{% else %}<div class="vw-card-placeholder">VibeWear</div>{% endif %}
+                                {% endwith %}
+                            </a>
+                            <div class="vw-wishlist-body">
+                                <h3><a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a></h3>
+                                <div class="price">₹{{ item.product.price }}</div>
+                                {% if item.product.in_stock %}
+                                    <form method="POST" action="{% url 'move_wishlist_to_cart' item.pk %}">
+                                        {% csrf_token %}
+                                        <div class="vw-wishlist-actions">
+                                            <select name="variant_id" aria-label="Size and colour for {{ item.product.name }}">
+                                                {% for variant in item.product.variants.all %}
+                                                    <option value="{{ variant.pk }}" {% if variant.stock <= 0 %}disabled{% endif %}>
+                                                        {{ variant.size.name }} / {{ variant.color.name }}{% if variant.stock <= 0 %} (out of stock){% endif %}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="vw-btn vw-btn-gold vw-btn-sm vw-btn-block">Move to cart</button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <p class="vw-muted">Out of stock</p>
+                                {% endif %}
+                                <form method="POST" action="{% url 'remove_from_wishlist' item.product.slug %}" style="margin-top:8px;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="vw-link-button">Remove from wishlist</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="vw-empty-state">
+                    <h2>Your wishlist is empty</h2>
+                    <p>Tap the heart on a product to save it here for later.</p>
+                    <a class="vw-btn vw-btn-gold" href="{% url 'shop' %}">Discover products</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

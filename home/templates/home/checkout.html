@@ -1,0 +1,143 @@
+{% extends 'home/base.html' %}
+{% block title %}Checkout - VibeWear{% endblock %}
+
+{% block content %}
+<div class="vw-page">
+    <div class="vw-page-head">
+        <div>
+            <h1>Checkout</h1>
+            <p>Cash on Delivery · Your order is confirmed instantly.</p>
+        </div>
+        <a class="vw-btn vw-btn-outline vw-btn-sm" href="{% url 'cart' %}">Back to cart</a>
+    </div>
+
+    <form method="POST" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <div class="vw-checkout-layout">
+            <div>
+                <div class="vw-card">
+                    <h2>Delivery address</h2>
+                    {% if addresses %}
+                        {% for address in addresses %}
+                            <label class="vw-address-option">
+                                <input type="radio" name="address_id" value="{{ address.pk }}" {% if selected_address_id == address.pk|stringformat:"s" or not selected_address_id and address.is_default %}checked{% endif %}>
+                                <span>
+                                    <strong>{{ address.full_name }}{% if address.label %} · {{ address.label }}{% endif %}</strong>
+                                    {{ address.address_line1 }}{% if address.address_line2 %}, {{ address.address_line2 }}{% endif %}<br>
+                                    {{ address.city }}, {{ address.state }} {{ address.postal_code }}, {{ address.country }}<br>
+                                    Phone: {{ address.phone }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                        <label class="vw-address-option">
+                            <input type="radio" name="address_id" value="new" {% if selected_address_id == 'new' or not addresses %}checked{% endif %}>
+                            <span><strong>Deliver to a new address</strong>Add a different delivery location for this order.</span>
+                        </label>
+                    {% endif %}
+
+                    <div id="new-address-fields" class="vw-checkout-new" {% if addresses and selected_address_id and selected_address_id != 'new' %}hidden{% endif %}>
+                        {% if addresses %}<h2 style="margin-top: 6px;">New address</h2>{% endif %}
+                        {% if address_form.non_field_errors %}
+                            <ul class="vw-errorlist">{{ address_form.non_field_errors }}</ul>
+                        {% endif %}
+                        <div class="vw-form-row">
+                            <div class="vw-field">
+                                <label for="{{ address_form.full_name.id_for_label }}">Full name</label>
+                                {{ address_form.full_name }}
+                                {{ address_form.full_name.errors }}
+                            </div>
+                            <div class="vw-field">
+                                <label for="{{ address_form.phone.id_for_label }}">Phone</label>
+                                {{ address_form.phone }}
+                                {{ address_form.phone.errors }}
+                            </div>
+                        </div>
+                        <div class="vw-field">
+                            <label for="{{ address_form.address_line1.id_for_label }}">Address line 1</label>
+                            {{ address_form.address_line1 }}
+                            {{ address_form.address_line1.errors }}
+                        </div>
+                        <div class="vw-field">
+                            <label for="{{ address_form.address_line2.id_for_label }}">Address line 2 (optional)</label>
+                            {{ address_form.address_line2 }}
+                            {{ address_form.address_line2.errors }}
+                        </div>
+                        <div class="vw-form-row">
+                            <div class="vw-field">
+                                <label for="{{ address_form.city.id_for_label }}">City</label>
+                                {{ address_form.city }}
+                                {{ address_form.city.errors }}
+                            </div>
+                            <div class="vw-field">
+                                <label for="{{ address_form.state.id_for_label }}">State</label>
+                                {{ address_form.state }}
+                                {{ address_form.state.errors }}
+                            </div>
+                        </div>
+                        <div class="vw-form-row">
+                            <div class="vw-field">
+                                <label for="{{ address_form.postal_code.id_for_label }}">Postal code</label>
+                                {{ address_form.postal_code }}
+                                {{ address_form.postal_code.errors }}
+                            </div>
+                            <div class="vw-field">
+                                <label for="{{ address_form.country.id_for_label }}">Country</label>
+                                {{ address_form.country }}
+                                {{ address_form.country.errors }}
+                            </div>
+                        </div>
+                        <div class="vw-form-row">
+                            <div class="vw-field">
+                                <label for="{{ address_form.label.id_for_label }}">Address label (optional)</label>
+                                {{ address_form.label }}
+                                {{ address_form.label.errors }}
+                            </div>
+                            <div class="vw-field vw-check-inline" style="display:flex; align-items:center; gap:8px; padding-top:22px;">
+                                {{ address_form.is_default }}
+                                <label for="{{ address_form.is_default.id_for_label }}" style="margin:0;">Save as default address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vw-card">
+                    <h2>Delivery instructions</h2>
+                    {{ notes_form.notes }}
+                    {{ notes_form.notes.errors }}
+                </div>
+            </div>
+
+            <aside class="vw-summary-card">
+                <h2>Order summary</h2>
+                <div class="vw-order-mini">
+                    {% for item in items %}
+                        <div class="vw-order-mini-item">
+                            <div>
+                                <div class="name">{{ item.product.name }}</div>
+                                <div class="qty">{{ item.variant.size.name }} / {{ item.variant.color.name }} · Qty {{ item.quantity }}</div>
+                            </div>
+                            <div class="price">₹{{ item.subtotal }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="vw-summary-row" style="margin-top:16px;"><span>Subtotal</span><span>₹{{ subtotal }}</span></div>
+                <div class="vw-summary-row"><span>Delivery</span><span>{% if shipping_fee %}₹{{ shipping_fee }}{% else %}Free{% endif %}</span></div>
+                <div class="vw-summary-row total"><span>Total</span><span>₹{{ total }}</span></div>
+
+                <div class="vw-cod-box" style="margin-top:16px;">
+                    <div>
+                        <strong>Cash on Delivery</strong>
+                        <p>Pay in cash when your order arrives. No online payment required.</p>
+                    </div>
+                </div>
+
+                <div class="vw-summary-actions">
+                    <button type="submit" class="vw-btn vw-btn-gold vw-btn-block">Place order · ₹{{ total }}</button>
+                    <a class="vw-btn vw-btn-outline vw-btn-block" href="{% url 'cart' %}">Edit cart</a>
+                </div>
+                <p class="vw-muted" style="text-align:center; margin-top:12px;">Final prices and stock are verified securely on our server.</p>
+            </aside>
+        </div>
+    </form>
+</div>
+{% endblock %}
