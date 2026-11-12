@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-m=u)s(bj+bjf^4vzxbbtje^8^b%c2k9omfoe#f+yj5v106(cov
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'vibewear-ecommerce.vercel.app',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
