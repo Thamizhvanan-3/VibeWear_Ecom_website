@@ -10,25 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m=u)s(bj+bjf^4vzxbbtje^8^b%c2k9omfoe#f+yj5v106(cov'
+if not SECRET_KEY:
+    raise RuntimeError("DJANGO_SECRET_KEY is not configured")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'vibewear-ecommerce.vercel.app',
+    '.vercel.app',
     'localhost',
     '127.0.0.1',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://vibewear-ecommerce.vercel.app',
 ]
 
 
