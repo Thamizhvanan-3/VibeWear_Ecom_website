@@ -40,18 +40,16 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
-        "DJANGO_ALLOWED_HOSTS",
-        "vibewear-ecommerce-l75skvstd-thamizhvanan-g.vercel.app,vibewear-ecommerce.vercel.app,.vercel.app",
+        "DJANGO_ALLOWED_HOSTS", ""
     ).split(",")
     if host.strip()
 ]
 
 # Ensure the production domain, localhost, and 127.0.0.1 are always preserved
 for host in (
-    "vibewear-ecommerce-l75skvstd-thamizhvanan-g.vercel.app",
-    ".vercel.app",
     "localhost",
     "127.0.0.1",
+    ".vercel.app",
 ):
     if host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(host)
